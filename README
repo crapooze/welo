@@ -1,0 +1,122 @@
+
+= Welo
+
+Welo is a library to work with resources in a general framework.
+It deals with the following concerns:
+  - relationships between resources
+  - structuring and access control with perspectives: one may or may not be able to access all fields of a resource
+  - identifiers and epithets
+  - serialization of resources
+
+== Perspectives
+
+When you look at a house, you usually can see walls, windows, a door, and a
+roof. If you can enter the house, then you will see rooms, furniture,
+inhabitants and so on. Depending on the room where you are, you will not see
+the roof. The concept of perspective is basically that: depending on where you
+look from (or who you are), you cannot observe the same parts of the same
+object. Perspectives have a name, and a set of symbols which corresponds to
+what someone can observe through this perspective.
+
+A piece of code for the above example could be:
+
+class House
+  include Welo::Resource
+  perspective :outside, [:walls, :windows, :roof, :door]
+  perspective :inside, [:rooms, :furniture, :inhabitants]
+end
+
+== Identifiers
+
+Say you have a lots of shirts, and picked one for a party. A close friend calls
+you and ask you which clothes you're taking. Then, you'll describe your shirt
+like "the black shirt with vertical stripes". You've just identified your
+shirt, by, giving enough information to uniquelly identify a shirt.  Then,
+depending on the situation, you may identify a shirt differently. As an
+example, the shop where you've bought your shirt has a reference number, and
+maybe a barcode to identify it.  By default, Welo will add a 'uuid' method
+(which is aliased to the object_id) for identifying a resource. You can always
+override that.
+
+class Shirt
+  include Welo::Resource
+  # identify :default, :uuid #what Welo does for you
+  identify :friend, :colors, :stripes, :length
+  identify :shop, :refnum
+end
+
+== Relationships
+
+Often, two things are related whith each other. With respect to the state of
+the art. So far, a person may have many shirts but has only two biological
+parents: a father and a mother. Currently, Welo has relationships of :one and
+:many kinds of relationships. This allow you to define some elaborate structures:
+
+class Person
+  include Welo::Resource
+  relationship :shirts, :Shirt, :many
+  relationship :father, :Person, :one
+  relationship :mother, :Person, :one
+end
+
+Someone used to relational system may notice that we only wrote one part of the
+relationships: if a person has another Person as a parent, therefore, the
+parents should have a sort of symmetrical relationship. For simplicity, Welo does not force you to write this symmetry relationship if you will not be using it in your program.
+Similarly, for now, there are no complex associations, like through
+associations. Welo's goal is not to build an ORM which optimizes SQL queries.
+
+Finally, there are two ways to qualify relationships: Nestings and Epithets.
+These two qualifiers are related to the various ways of identifying related
+resources.
+
+=== Nesting 
+Nestings, let you use an external way of identifying a resource. In that case,
+the resource identification's scheme depends on the resources, but the value of
+the identification is within the nested resource itself.  As an example, for a
+company, an employee will be identified upon its social security number,
+whereas, in a pub, friends will use his name.
+Nesting, just mark a preferred way of identifying related resources.
+
+class Person
+  include Welo::Resource
+  identify :friend, :name
+  identify :company, :ssn
+  relationship :friends, :Person, :many
+  nesting :friends, :friend
+end
+
+class Company
+  include Welo::Resource
+  relationship :employees, :Person, :many
+  nesting :employees, :company
+end
+
+=== Epithets
+Epithets are similar to nestings, but the way of identifying a resource is only
+related to the pointing resource.  As an example, a person may have three
+preferred movies. This naming scheme is only personal to the person, but not to
+the movies. So, if you know that an object has preferred movies, you don't need
+to know anything about the movie to identify it within the context of a person.
+For now, declaring requires you must first specify that the matching
+relationship is a mere alias, then declare the epithet's method for identifying
+the related resource.
+
+class Movie
+  include Welo::Resource
+end
+
+class Person
+  include Welo::Resource
+  relationship :preferred_movies, :Movie, :many, :alias
+  epithet :preferred_movies, :rank_for_preffered_movie
+
+  def rank_for_preffered_movie(movie)
+    @preferred_movies.index(movie)
+  end
+end
+
+== Coming later
+
+* Embedding (similar to mongo's embedded documents).
+* ResourceProxys to manipulate distant resources, or resources observed from one perspective, with missing fields.
+

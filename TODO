@@ -1,0 +1,8 @@
+* Relationships
+  - we have :one, :many, we should be able to have, exactly_four, or one_per_foo
+* Epitheting vs. Nesting vs. Identifying
+  - remove alias from Relationship and create a similar Epiteth object?
+* Embeddings
+  - recursively embedded datastructures?
+  - how to work with perspectives?
+* ResourceProxy
