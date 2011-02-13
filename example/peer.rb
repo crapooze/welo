@@ -4,7 +4,7 @@ require 'welo'
 class MyFile
   include Welo::Resource
   attr_accessor :name, :sha1
-  identify :default, :sha1
+  identify :default, [:sha1]
   relationship :peers, :Peer, :many
   perspective :default, [:name, :sha1]
   def initialize(name)
@@ -16,8 +16,8 @@ end
 class Peer
   include Welo::Resource
   attr_accessor :name, :peers, :cost, :files, :ipaddr
-  identify :default, :name
-  identify :peer, :ipaddr
+  identify :default, [:name]
+  identify :peer, [:ipaddr]
   relationship :peers, :Peer, :many
   relationship :files, :MyFile, :many
   relationship :preferred_files, :MyFile, :many, :alias
