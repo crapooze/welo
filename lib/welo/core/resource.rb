@@ -1,13 +1,14 @@
 
 module Welo
+  autoload :Link, 'welo/core/link'
+  autoload :LinksEnumerator, 'welo/core/link'
+  autoload :Relationship, 'welo/core/relationship'
+  autoload :Perspective, 'welo/core/perspective'
+  autoload :Nesting, 'welo/core/nesting'
+  autoload :IdentifyingMatcher, 'welo/core/matcher'
+  autoload :EpithetMatcher, 'welo/core/matcher'
+
   module Resource
-    autoload :Link, 'welo/core/link'
-    autoload :LinksEnumerator, 'welo/core/link'
-    autoload :Relationship, 'welo/core/relationship'
-    autoload :Perspective, 'welo/core/perspective'
-    autoload :Nesting, 'welo/core/nesting'
-    autoload :IdentifyingMatcher, 'welo/core/matcher'
-    autoload :EpithetMatcher, 'welo/core/matcher'
 
     # A simple hook to extend the ClassMethods
     def self.included(mod)
@@ -66,8 +67,8 @@ module Welo
       # If one argument, returns the perspective for the given name, 
       # or the :default one if it exists
       # If more than one argument, registers a new perspective
-      def perspective(name=nil, *syms)
-        if syms.empty?
+      def perspective(name, syms=nil)
+        if syms.nil?
           perspectives[name] || perspectives[:default]
         else
           perspectives[name] = Perspective.new(name, *syms)
@@ -112,8 +113,8 @@ module Welo
       # Since they may be used to build an URL, identifying fields
       # must respond to :to_s.
       # See Resource#identifying_path_part
-      def identify(sym, *vals)
-        if vals.empty?
+      def identify(sym, vals=nil)
+        if vals.nil?
           identifiers_hash[sym]
         else
           identifiers_hash[sym] = vals
@@ -223,7 +224,12 @@ module Welo
 
     # Returns the full URL of this object
     def path(ident=:default)
-      File.join base_path, identifying_path_part(ident)
+      tail = identifying_path_part(ident)
+      if tail.empty?
+        base_path
+      else
+        File.join base_path, tail
+      end
     end
 
     # Same as Resource.identifiers
@@ -292,8 +298,8 @@ module Welo
 
     alias uuid object_id
 
-    def epitheting_path_part(resource, name)
-      File.join epithet(name).map{|sym| send(sym, resource).to_s}
+    def epitheting_path_part(resource, label)
+      File.join epithet(label).map{|sym| send(sym, resource).to_s}
     end
 
     def epithet_path_to(resource, label)

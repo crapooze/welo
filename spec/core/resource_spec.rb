@@ -50,7 +50,7 @@ describe Resource, 'class modifications' do
   end
 
   it "should record the identifiers with label" do
-    @klass.identify :abc, :foo, :bar
+    @klass.identify :abc, [:foo, :bar]
     @klass.identify(:abc).should eql([:foo, :bar])
   end
 
@@ -70,13 +70,18 @@ describe Resource, 'class modifications' do
   end
 
   it "should build the path model on the identity map" do
-    @klass.identify :abc, :foo, :bar
+    @klass.identify :abc, [:foo, :bar]
     @klass.path_model(:abc).should eql('klass/:foo/:bar')
   end
 
   it "should build the path model and prefix the params" do
-    @klass.identify :abc, :foo, :bar
+    @klass.identify :abc, [:foo, :bar]
     @klass.path_model(:abc, 'abc.').should eql('klass/:abc.foo/:abc.bar')
+  end
+
+  it "should allow empty identifiers" do
+    @klass.identify :null, []
+    @klass.new.path(:null).should eql('klass')
   end
 end
 
@@ -90,7 +95,7 @@ describe Resource, 'class inheritance' do
       perspective :foo, [:bar, :baz]
       relationship :foo, :bar, :baz
       nesting :foo, :bar
-      identify :abc, :foo, :bar, :baz
+      identify :abc, [:foo, :bar, :baz]
     end
   end
   
@@ -146,7 +151,7 @@ describe Resource, 'identifying path' do
       def self.name
         "klass"
       end
-      identify :bla, :foo, :bar, :baz
+      identify :bla, [:foo, :bar, :baz]
       attr_accessor :foo, :bar, :baz
     end
     @obj = @klass.new
@@ -169,7 +174,7 @@ describe Resource, 'real world instances matching' do
       end
       perspective :foo, [:bar, :baz]
       relationship :foo, :bar, :baz
-      identify :abc, :foo, :bar, :baz
+      identify :abc, [:foo, :bar, :baz]
       attr_accessor :foo, :bar, :baz
     end
     @obj = @klass.new
