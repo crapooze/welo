@@ -115,7 +115,7 @@ describe EpithetMatcher, 'real world instances' do
       def self.name
         "klass"
       end
-      epithet :other, :other_foo, :other_bar, :other_baz
+      epithet :other, [:other_foo, :other_bar, :other_baz]
       attr_accessor :foo, :bar, :baz
       def other_foo(other)
         other.foo

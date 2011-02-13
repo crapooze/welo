@@ -22,7 +22,7 @@ class Peer
   relationship :files, :MyFile, :many
   relationship :preferred_files, :MyFile, :many, :alias
   epithet :preferred_files, 
-    :index_for_preffered_file, :scrambled_name_for_preffered_file
+    [:index_for_preffered_file, :scrambled_name_for_preffered_file]
   nesting :peers, :peer
   perspective :default, [:name, :uuid, :peers, :files, :preferred_files, :cost]
 

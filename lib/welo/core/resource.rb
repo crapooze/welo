@@ -134,8 +134,8 @@ module Welo
         @epithets_hash ||= {}
       end
 
-      def epithet(sym, *vals)
-        if vals.empty?
+      def epithet(sym, vals=nil)
+        if vals.nil?
           epithets_hash[sym]
         else
           epithets_hash[sym] = vals
