@@ -20,7 +20,7 @@ module Welo
 
     # creates a new relationship for sym and klass, with all the given kinds
     # providing incompatibles kinds lead to an ArgumentError
-    def initialize(sym, klass, *kinds)
+    def initialize(sym, klass, kinds)
       raise ArgumentError, "incompatible kinds" if self.class.incompatible_kinds?(kinds)
       @sym = sym
       @klass = klass

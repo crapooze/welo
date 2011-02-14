@@ -5,7 +5,7 @@ class MyFile
   include Welo::Resource
   attr_accessor :name, :sha1
   identify :default, [:sha1]
-  relationship :peers, :Peer, :many
+  relationship :peers, :Peer, [:many]
   perspective :default, [:name, :sha1]
   def initialize(name)
     @name = name
@@ -18,9 +18,9 @@ class Peer
   attr_accessor :name, :peers, :cost, :files, :ipaddr
   identify :default, [:name]
   identify :peer, [:ipaddr]
-  relationship :peers, :Peer, :many
-  relationship :files, :MyFile, :many
-  relationship :preferred_files, :MyFile, :many, :alias
+  relationship :peers, :Peer, [:many]
+  relationship :files, :MyFile, [:many]
+  relationship :preferred_files, :MyFile, [:many, :alias]
   epithet :preferred_files, 
     [:index_for_preffered_file, :scrambled_name_for_preffered_file]
   nesting :peers, :peer

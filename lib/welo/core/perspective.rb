@@ -4,9 +4,9 @@ module Welo
     attr_reader :name
     attr_reader :fields #symbols or relationships?
 
-    def initialize(name, *fields)
+    def initialize(name, fields)
       @name = name
-      @fields = *fields
+      @fields = fields
     end
   end
 end

@@ -51,9 +51,9 @@ module Welo
       # If one argument, returns the relationship with the given name
       # If more than one argument, registers a new relationship,
       # possibly overwriting it.
-      def relationship(sym, klass=nil, *kinds)
+      def relationship(sym, klass=nil, kinds=[])
         if klass
-          relationships[sym] = Relationship.new(sym, klass, *kinds)
+          relationships[sym] = Relationship.new(sym, klass, kinds)
         else
           relationships[sym]
         end
@@ -71,7 +71,7 @@ module Welo
         if syms.nil?
           perspectives[name] || perspectives[:default]
         else
-          perspectives[name] = Perspective.new(name, *syms)
+          perspectives[name] = Perspective.new(name, syms)
         end
       end
 

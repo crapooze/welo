@@ -9,7 +9,7 @@ describe IdentifyingMatcher, 'real world instances' do
         "klass"
       end
       perspective :foo, [:bar, :baz]
-      relationship :foo, :bar, :baz
+      relationship :foo, :bar, [:baz]
       identify :abc, [:foo, :bar, :baz]
       attr_accessor :foo, :bar, :baz
     end

@@ -60,7 +60,7 @@ describe Resource, 'class modifications' do
   end
 
   it "should record the relationships" do
-    @klass.relationship(:foo, :bar, :baz)
+    @klass.relationship(:foo, [:bar, :baz])
     @klass.relationship(:foo).should_not be_nil
   end
 
@@ -93,7 +93,7 @@ describe Resource, 'class inheritance' do
         "klass"
       end
       perspective :foo, [:bar, :baz]
-      relationship :foo, :bar, :baz
+      relationship :foo, :bar, [:baz]
       nesting :foo, :bar
       identify :abc, [:foo, :bar, :baz]
     end
@@ -173,7 +173,7 @@ describe Resource, 'real world instances matching' do
         "klass"
       end
       perspective :foo, [:bar, :baz]
-      relationship :foo, :bar, :baz
+      relationship :foo, :bar, [:baz]
       identify :abc, [:foo, :bar, :baz]
       attr_accessor :foo, :bar, :baz
     end
@@ -242,9 +242,9 @@ describe Resource, 'structuring' do
     @klass = Class.new do
       include Resource
       base_path 'test'
-      relationship :foo, :baz, :one
-      relationship :bar, :bar, :many
-      relationship :broken, :baz, :really, :broken
+      relationship :foo, :baz, [:one]
+      relationship :bar, :bar, [:many]
+      relationship :broken, :baz, [:really, :broken]
       perspective :perspective, [:foo, :bar, :baz]
       perspective :broken, [:broken]
       attr_accessor :foo, :bar, :baz
@@ -268,7 +268,9 @@ describe Resource, 'structuring' do
     lambda{@klass.structure(:nonexistant)}.should raise_error(ArgumentError)
   end
 
-  it "should complain about the relationship" do
+  it "should complain about the relationship being of unknown kind" do
+    rel = @obj.relationship(:broken)
+    lambda {@obj.link_for_rel(rel)}.should raise_error(ArgumentError)
     lambda {@obj.structure_pairs(:broken)}.should raise_error(ArgumentError)
   end
 

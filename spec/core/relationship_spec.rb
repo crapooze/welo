@@ -4,24 +4,24 @@ require 'welo/core/relationship'
 
 describe "Relationship" do
   it "should remember the sym" do
-    rel = Relationship.new(:foo, '', '')
+    rel = Relationship.new(:foo, '', [''])
     rel.sym.should equal(:foo)
   end
 
   it "should remember the klass" do
-    rel = Relationship.new('', :foo, '')
+    rel = Relationship.new('', :foo, [''])
     rel.klass.should equal(:foo)
   end
 
   it "should remember one kind" do
-    rel = Relationship.new('', '', :foo)
+    rel = Relationship.new('', '', [:foo])
     rel.kinds.should eql([:foo])
   end
 end
 
 describe "a 'many' Relationship, with several kinds" do
   before(:each) do
-    @rel = Relationship.new('', '', :a, :b, :many, :foo, :bar)
+    @rel = Relationship.new('', '', [:a, :b, :many, :foo, :bar])
   end
 
   it "should remember many kinds" do
@@ -39,7 +39,7 @@ end
 
 describe "a 'one' Relationship, with several kinds" do
   before(:each) do
-    @rel = Relationship.new('', '', :a, :b, :one, :foo, :bar)
+    @rel = Relationship.new('', '', [:a, :b, :one, :foo, :bar])
   end
 
   it "should remember all kinds" do
