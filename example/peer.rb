@@ -1,21 +1,42 @@
 
 require 'welo'
 
+class Chunk
+  include Welo::Resource
+  perspective :indexing, [:index, :data]
+  attr_reader :index, :data
+  def initialize(index)
+    @index = index
+    @data = random_garbage
+  end
+
+  def random_garbage
+    (1 .. 10).map{|i| rand(256)}.pack('C*').unpack('H2'*10).join
+  end
+end
+
 class MyFile
   include Welo::Resource
-  attr_accessor :name, :sha1
+  attr_accessor :name, :sha1, :chunks
   identify :default, [:sha1]
   relationship :peers, :Peer, [:many]
-  perspective :default, [:name, :sha1]
+  relationship :chunks, :Chunk, [:many, :embedded]
+  perspective :default, [:name, :sha1, :size, :chunks]
+  embedding :chunks, :indexing
+  def size
+    chunks.size
+  end
+
   def initialize(name)
     @name = name
     @sha1 = name.sum #stub in place for an actual SHA1
+    @chunks = (rand(5) + 1).times.map{|i| Chunk.new(i)}
   end
 end
 
 class Peer
   include Welo::Resource
-  attr_accessor :name, :peers, :cost, :files, :ipaddr
+  attr_accessor :name, :nicknames, :peers, :cost, :files, :ipaddr
   identify :default, [:name]
   identify :peer, [:ipaddr]
   relationship :peers, :Peer, [:many]
@@ -24,10 +45,11 @@ class Peer
   epithet :preferred_files, 
     [:index_for_preffered_file, :scrambled_name_for_preffered_file]
   nesting :peers, :peer
-  perspective :default, [:name, :uuid, :peers, :files, :preferred_files, :cost]
+  perspective :default, [:name, :nicknames, :uuid, :peers, :files, :preferred_files, :cost]
 
   def initialize(name)
     @name = name
+    @nicknames = [name] * 3
     @ipaddr = "10.0.0.#{name.length}"
     @files = []
     @peers = []

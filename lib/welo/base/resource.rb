@@ -6,14 +6,23 @@ module Welo
     # returns a text representation of the resource, under
     # the persp perspective, 
     # the format is not standardized, suitable for dev cycles
-    def to_text(persp)
+    def to_text(persp, ident=1)
       ret = ''
       structure_pairs(persp).each do |k,val|
-        ret << "##{k}\n"
-        if val.respond_to? :map
-          ret << val.map{|v| v.to_s}.join("\n")
+        ret << "#"*ident + "#{k}\n"
+        case val
+        when Embedder
+          ret << val.to.to_text(val.perspective, ident+1)
+        when EmbeddersEnumerator
+          val.each do |v| 
+            ret << v.to.to_text(v.perspective, ident+1)
+          end
         else
-          ret << val.to_s
+          if val.respond_to? :map
+            ret << val.map{|v| v.to_s}.join("\n")
+          else
+            ret << val.to_s
+          end
         end
         ret << "\n"
       end
@@ -43,9 +52,31 @@ module Welo
       end
     end
 
+    def embedder_to_serialized_hash(embedder)
+      embedder.to.to_serialized_hash(embedder.perspective)
+    end
+
+    # similar to serialized_pairs, but with the Embedders serialized as hash
+    # this method is cross recursive with to_serialized_hash
+    def hash_flattened_pairs(persp)
+      serialized_pairs(persp).map do |sym,val|
+        new_val = case val
+                  when Embedder
+                    val.to_serialized_hash
+                    embedder_to_serialized_hash(val)
+                  when EmbeddersEnumerator
+                    val.map{|v| embedder_to_serialized_hash(v)}
+                  else
+                    val
+                  end
+        [sym,new_val]
+      end
+    end
+
     # similar to to_rb_hash, but with the urls serialized
+    # this method is cross recursive with hash_flattened_pairs
     def to_serialized_hash(persp)
-      Hash[serialized_pairs(persp)]
+      Hash[hash_flattened_pairs(persp)]
     end
 
     # returns a JSON representation of the resource, under

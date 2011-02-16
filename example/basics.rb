@@ -17,9 +17,18 @@ puts
 puts foo.to_text(:default)
 puts
 
+puts a.to_text(:default)
+puts
+
+puts a.to_YAML(:default)
+puts
+
 begin
   require 'json'
   puts foo.to_json(:default)
+  puts
+
+  puts a.to_json(:default)
   puts
 rescue LoadError
   puts "no json example, install json if you want"
