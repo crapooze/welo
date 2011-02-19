@@ -1,5 +1,7 @@
 * Embeddings
   - merge the branch
   - use the complex serialization overhead only when needed loaded
-* ResourceProxy
-  - create from perspective
+* Observations
+  - make them more useful
+* Proxies
+  - a class like observations
