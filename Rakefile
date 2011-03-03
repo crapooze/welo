@@ -25,6 +25,7 @@ spec = Gem::Specification.new do |s|
           'lib/welo/core/link.rb',
           'lib/welo/core/matcher.rb',
           'lib/welo/core/nesting.rb',
+          'lib/welo/core/observation.rb',
           'lib/welo/core/perspective.rb',
           'lib/welo/base/resource.rb',
         ]

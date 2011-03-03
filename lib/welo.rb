@@ -1,6 +1,6 @@
 
 module Welo
-  VERSION = "0.0.6"
+  VERSION = "0.0.7"
   AUTHORS = ['crapooze']
   WEBSITE = "http://github.com/crapooze/welo"
   LICENCE = "MIT"
