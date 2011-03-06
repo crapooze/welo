@@ -4,5 +4,6 @@
 * Observations
   - change relationships into something different
   - observatory class to generate observations/actor which is able to observe?
+  - decent examples
 * Proxies
   - a class like observations to manipulate distant
