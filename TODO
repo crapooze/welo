@@ -2,6 +2,7 @@
   - merge the branch
   - use the complex serialization overhead only when needed loaded
 * Observations
-  - make them more useful
+  - change relationships into something different
+  - observatory class to generate observations/actor which is able to observe?
 * Proxies
-  - a class like observations
+  - a class like observations to manipulate distant
