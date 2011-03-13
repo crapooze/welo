@@ -15,7 +15,7 @@ class Peer
   perspective :other_peer, [:uuid, :files, :cost]
 end
 
-observation_klass = Welo::ObservationMaker.new(Peer).structure(:default) do
+observation_klass = Welo::ObservationStruct.new_for_resource_in_perspective(Peer, :default) do
   def hello
     "helo from #{uuid}"
   end
@@ -27,4 +27,3 @@ obs = observation_klass.for_hash(:uuid => '321',
 
 p obs
 obs.hello
-

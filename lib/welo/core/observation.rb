@@ -29,6 +29,9 @@ module Welo
       st
     end
 
+    # Hook to remove the new_for_resource_in_perspective methods, which is
+    # designed only for ObservationStruct but is inherited by the Struct
+    # classes if nothing is done.
     def self.inherited(klass)
       klass.instance_eval do 
         undef :new_for_resource_in_perspective
@@ -40,6 +43,12 @@ module Welo
       # of resource it's looking at.
       attr_accessor :resource
 
+      # Instanciates a new struct object (i.e., not a Struct class).  The
+      # fields are populated from the key/value pairs from hash.  If the
+      # structure fields correspond to a relationship, then a
+      # DelayedObservation object is created. It will then be the
+      # responsibility of the developper to continue observing the delayed
+      # observation or not.
       def for_hash(hash)
         vals = members.map do |k|
           rel = resource.relationship(k)
@@ -59,31 +68,6 @@ module Welo
         obj._source_ = src
         obj
       end
-    end
-  end
-
-  # An ObseravtionMaker is a metaprogramming class whose goal is to create
-  # ObservationStruct classes for (exactly) one resource's perspectives.
-  # XXX nota-bene: this class will disappear
-  class ObservationMaker
-    # The resource from which observation are being made
-    attr_accessor :resource
-
-    # A hash to cache the structures (ObservationStruct ruby classes) 
-    # for the various perspectives.
-    attr_accessor :structures
-
-    def initialize(res=nil)
-      @resource = res
-      @structures = {}
-    end
-
-    def structure(name=:default, &blk)
-      @structures[name] ||= create_structure!(name, &blk)
-    end
-
-    def create_structure!(persp, &blk)
-      ObservationStruct.new_for_resource_in_perspective(resource, persp, &blk)
     end
   end
 

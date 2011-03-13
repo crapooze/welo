@@ -4,6 +4,6 @@ module Welo
   AUTHORS = ['crapooze']
   WEBSITE = "http://github.com/crapooze/welo"
   LICENCE = "MIT"
-  autoload :Resource, 'welo/base/resource'
-  autoload :ObservationMaker, 'welo/core/observation'
+  require 'welo/base/resource'
+  require 'welo/core/observation'
 end
