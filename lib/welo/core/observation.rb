@@ -15,12 +15,24 @@ module Welo
     attr_accessor :_source_
     alias :source :_source_
 
+    # Creates a new structure, class which fields correspond to the perspective
+    # named name in resource.  If a block is passed, then it is evaluated in
+    # the context of the new structure (like Struct.new { ... }).
+    #
+    # Normally, this method would be inherited by the structure, but we do not want to.
+    # Thus we undef it in self.inherited (see self.inherited).
     def self.new_for_resource_in_perspective(resource, name, &blk)
       persp = resource.perspective(name)
       raise ArgumentError.new("no such perspective: #{name} for #{resource}") unless persp
-      st = ObservationStruct.new(*persp.fields, &blk)
+      st = self.new(*persp.fields, &blk)
       st.resource = resource
       st
+    end
+
+    def self.inherited(klass)
+      klass.instance_eval do 
+        undef :new_for_resource_in_perspective
+      end
     end
 
     class << self
@@ -52,6 +64,7 @@ module Welo
 
   # An ObseravtionMaker is a metaprogramming class whose goal is to create
   # ObservationStruct classes for (exactly) one resource's perspectives.
+  # XXX nota-bene: this class will disappear
   class ObservationMaker
     # The resource from which observation are being made
     attr_accessor :resource
