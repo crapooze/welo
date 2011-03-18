@@ -3,9 +3,7 @@ require 'derailleur'
 
 module Welo
   # DelayedObservation is a class representing a subsequent observation.
-  class DelayedObservation 
-    attr_accessor :observation, :relationship, :path
-  end
+  DelayedObservation = Struct.new(:observation, :relationship, :path)
 
   # An ObservationStruct is a special Struct (i.e. a class whose 
   # instances are structures).
@@ -60,53 +58,40 @@ module Welo
         end
         self.new(*vals)
       end
-
-      def for_source(src)
-        raise NotImplemented
-        #TODO: figure-out a good API instead of source.to_h, will depend on the source class
-        obj = for_hash(source.to_h)
-        obj._source_ = src
-        obj
-      end
     end
   end
 
-  class ObservationSource
-    #XXX TODO
-  end
-
-  # An Observer is an object which is responsible for creating.
+  # An Observer is an object which is responsible for creating resources
+  # observations.
   class Observer
     attr_reader :registrations, :models
     def initialize(models=[])
       @registrations = {}
       @models = models
     end
-  end
 
-  class FileSystemObserver < Observer
-    FileSystemObservationSource = Struct.new(:root, :path)
-
-    class DB
-      include Derailleur::Application
-      def initialize(models)
-        super
-        #creates the tree to map the DB structure to classes paths
-        models.each do |model|
-          path = model.path_model(:flat_db) #XXX allow to change the db identifying name
-          node = build_route(path)
-          node.content = model
-        end
+    def event(name, obj)
+      registrations[name].each do |blk|
+        blk.call(obj)
       end
     end
 
-    #TODO 
-    # - load from one path + file
-    # - find many in the database/a database path
-    # - callbacks to monitor changes with inotify
-  end
+    def register(event_name,&blk)
+      registrations[event_name] ||= []
+      registrations[event_name] << blk 
+    end
 
-  class HTTPObserver < Observer
-    #TODO: use net/http or em-http
+    #TODO: unregister
+
+    def observe_source(source, observation_struct)
+      data = source.observe
+      hash = {}
+      observation_struct.members.each do |sym|
+        hash[sym] = data[sym.to_s]
+      end
+      obs = observation_struct.for_hash(hash)
+      obs._source_ = source
+      event(:observation, obs)
+    end
   end
 end

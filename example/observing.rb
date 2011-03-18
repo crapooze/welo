@@ -21,9 +21,17 @@ observation_klass = Welo::ObservationStruct.new_for_resource_in_perspective(Peer
   end
 end
 
-obs = observation_klass.for_hash(:uuid => '321', 
-                           :files => [],
-                           :cost => 10)
+class DummyObserver < Welo::Observer
+end
+RubyObjectSource = Struct.new(:observe)
 
-p obs
-obs.hello
+observer = DummyObserver.new([Peer])
+
+observer.register(:observation) do |o|
+  p o
+  p o.hello
+end
+
+h = {'uuid' => '321', 'files' => [], 'cost' => 10 }
+
+observer.observe_source(RubyObjectSource.new(h), observation_klass)
