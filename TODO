@@ -2,8 +2,8 @@
   - merge the branch
   - use the complex serialization overhead only when needed loaded
 * Observations
-  - change relationships into something different
-  - observatory class to generate observations/actor which is able to observe?
-  - decent examples
+  - boil-down to a better API
+    + improve the DelayedObservation thing
+    + improve the Observer's eventing
 * Proxies
   - a class like observations to manipulate distant
