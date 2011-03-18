@@ -1,6 +1,4 @@
 
-require 'derailleur'
-
 module Welo
   # DelayedObservation is a class representing a subsequent observation.
   DelayedObservation = Struct.new(:observation, :relationship, :path)
