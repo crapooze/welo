@@ -62,34 +62,71 @@ module Welo
   # An Observer is an object which is responsible for creating resources
   # observations.
   class Observer
-    attr_reader :registrations, :models
+    Registration = Struct.new(:event_name, :cb)
+
+    # A hash mapping event name to their registrations
+    attr_reader :registrations
+
+    # An array of models this observer can understand
+    attr_reader :models
+
+    # Creates a new observer for the given models.
     def initialize(models=[])
       @registrations = {}
       @models = models
     end
 
-    def event(name, obj)
-      registrations[name].each do |blk|
-        blk.call(obj)
+    # Calls all the callback for the registrations in one event named according 
+    # to the first parameter.
+    # A second parameter can be passed to the callbacks.
+    #
+    # The name :observation should be reserved to the observing duties.
+    # See observe_source for why.
+    def event(name, obj=nil)
+      regs = registrations[name]
+      return unless regs
+      regs.each do |reg|
+        reg.cb.call(obj)
       end
     end
 
+    # Registers a new callback given in the block parameter for the given event.
+    # Returns a Registration instance, you should keep track of this instance if 
+    # you plan to unregister it later.
     def register(event_name,&blk)
       registrations[event_name] ||= []
-      registrations[event_name] << blk 
+      reg = Registration.new(event_name,blk)
+      registrations[event_name] << reg
+      reg
     end
 
-    #TODO: unregister
+    # Removes exactly one registration given the Registration instance.
+    # The parameter should be a value previously returned by register on the 
+    # same object.
+    def unregister(registration)
+      regs = registrations[registration.event_name]
+      raise ArgumentError, "no registratons for #{registration.event_name}" unless regs
+      regs.delete(registration)
+    end
 
+    # Removes all the registrations for a given event name.
+    def unregister_all(event_name)
+      registrations.delete(event_name)
+    end
+
+    # Observe a source by calling it's observe method, and pushing it's
+    # successive yielded values into a new instance of observation_struct.
+    # Then calls the :observation event with the new observation as parameter.
     def observe_source(source, observation_struct)
-      data = source.observe
-      hash = {}
-      observation_struct.members.each do |sym|
-        hash[sym] = data[sym.to_s]
+      source.observe do |data|
+        hash = {}
+        observation_struct.members.each do |sym|
+          hash[sym] = data[sym.to_s]
+        end
+        obs = observation_struct.for_hash(hash)
+        obs._source_ = source
+        event(:observation, obs)
       end
-      obs = observation_struct.for_hash(hash)
-      obs._source_ = source
-      event(:observation, obs)
     end
   end
 end

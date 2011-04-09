@@ -23,7 +23,11 @@ end
 
 class DummyObserver < Welo::Observer
 end
-RubyObjectSource = Struct.new(:observe)
+RubyObjectSource = Struct.new(:item) do
+  def observe
+    yield item
+  end
+end
 
 observer = DummyObserver.new([Peer])
 
