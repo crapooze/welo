@@ -77,12 +77,15 @@ describe Observer,"calling events" do
   end
 end
 
-__END__
-#FOR LATER
 describe Observer,"observing something" do
   before :each do
     @obs = Observer.new
     @myError = Class.new(StandardError)
+    @myObsStruct = Struct.new(:a, :_source_) do
+      def self.for_hash(hash)
+        self.new(hash[:a])
+      end
+    end
     @mySource = Class.new do
       attr_reader :observations
       def initialize(obs=[])
@@ -96,12 +99,19 @@ describe Observer,"observing something" do
 
   it "should call the :observation event" do
     @obs.register(:observation){raise @myError.new}
-    src = @mySource.new([{:a => :b}])
-    st = Struct.new(:a) do
-      def self.for_hash(h)
-        p h
-      end
-    end
-    lambda { @obs.observe_source(src, st) }.should raise_error(@myError)
+    hashes = [{:a => :b}]
+    observations = hashes.map{|h| @myObsStruct.new(h)}
+    src = @mySource.new(observations)
+    lambda { @obs.observe_source(src, @myObsStruct) }.should raise_error(@myError)
+  end
+
+  it "should call the :observation event several times" do
+    ary = []
+    @obs.register(:observation){|o| ary << o.a}
+    hashes = [{:a => :b}, {:a => :c}]
+    observations = hashes.map{|h| @myObsStruct.for_hash(h)}
+    src = @mySource.new(observations)
+    lambda { @obs.observe_source(src, @myObsStruct) }.should_not raise_error
+    ary.should eql([:b, :c])
   end
 end
