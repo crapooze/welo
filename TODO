@@ -1,10 +1,5 @@
 * Embeddings
   - merge the branch
   - use the complex serialization overhead only when needed loaded
-* Observations
-  - boil-down to a better API
-    + too many complications/interface for observe_source (for_hash, _source_ ...)
-    + improve the DelayedObservation thing or remove it altogether
-  - spec for all these
 * Proxies
   - a class like observations to manipulate distant
