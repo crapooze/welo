@@ -22,6 +22,7 @@ module Welo
       raise ArgumentError.new("no such perspective: #{name} for #{resource}") unless persp
       st = self.new(*persp.fields, &blk)
       st.resource = resource
+      st.perspective = name
       st
     end
 
@@ -38,6 +39,10 @@ module Welo
       # The resource of an ObservationStruct is the type 
       # of resource it's looking at.
       attr_accessor :resource
+
+      # The perspective of an ObservationStruct is the parts
+      # of resource it's looking at.
+      attr_accessor :perspective
 
       # Instanciates a new struct object (i.e., not a Struct class).  The
       # fields are populated from the key/value pairs from hash.  If the
@@ -67,13 +72,8 @@ module Welo
     # A hash mapping event name to their registrations
     attr_reader :registrations
 
-    # An array of models this observer can understand
-    attr_reader :models
-
-    # Creates a new observer for the given models.
-    def initialize(models=[])
+    def initialize
       @registrations = {}
-      @models = models
     end
 
     # Calls all the callback for the registrations in one event named according 
