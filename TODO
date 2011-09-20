@@ -2,7 +2,7 @@
   - we have :one, :many, we should be able to have, exactly_four, or one_per_foo
 * Epitheting vs. Nesting vs. Identifying
   - remove alias from Relationship and create a similar Epiteth object?
+  - inherit all these from Link, NormalLink, EpithetLink, EmbeddedLink
 * Embeddings
-  - recursively embedded datastructures?
-  - how to work with perspectives?
+  - how to work with recursing perspectives?
 * ResourceProxy

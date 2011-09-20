@@ -20,7 +20,7 @@ class MyFile
   attr_accessor :name, :sha1, :chunks
   identify :default, [:sha1]
   relationship :peers, :Peer, [:many]
-  relationship :chunks, :Chunk, [:many, :embedded]
+  relationship :chunks, :Chunk, [:many]
   perspective :default, [:name, :sha1, :size, :chunks]
   embedding :chunks, :indexing
   def size
