@@ -15,7 +15,7 @@ module Welo
     # current incompatibilities:
     # - :one and :many at the same time
     def self.incompatible_kinds?(kinds)
-      (kinds & [:one, :many]).size == 2
+      ((kinds & [:one, :many]).size == 2) 
     end
 
     # creates a new relationship for sym and klass, with all the given kinds

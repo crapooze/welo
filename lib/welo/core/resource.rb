@@ -2,9 +2,12 @@
 module Welo
   autoload :Link, 'welo/core/link'
   autoload :LinksEnumerator, 'welo/core/link'
+  autoload :Embedder, 'welo/core/embedder'
+  autoload :EmbeddersEnumerator, 'welo/core/embedder'
   autoload :Relationship, 'welo/core/relationship'
   autoload :Perspective, 'welo/core/perspective'
   autoload :Nesting, 'welo/core/nesting'
+  autoload :Embedding, 'welo/core/embedding'
   autoload :IdentifyingMatcher, 'welo/core/matcher'
   autoload :EpithetMatcher, 'welo/core/matcher'
 
@@ -35,6 +38,9 @@ module Welo
         identifiers_hash.each_pair do |k,v|
           klass.identifiers_hash[k] = v
         end
+        embeddings.each_pair do |k,v|
+          klass.embeddings[k] = v
+        end
         klass.base_path base_path
       end
 
@@ -46,6 +52,11 @@ module Welo
       # The hash of nestings of other resources
       def nestings
         @nestings ||= {}
+      end
+
+      # The hash of embeddings of other resources
+      def embeddings
+        @embeddings ||= {}
       end
 
       # If one argument, returns the relationship with the given name
@@ -82,6 +93,16 @@ module Welo
           nestings[resource_sym]
         else
           nestings[resource_sym] = Nesting.new(resource_sym, identifier_sym)
+        end
+      end
+
+      # If one argument, returns the embedding for the given resource_sym
+      # If two arguments: creates a embedding of a resource in this resource
+      def embedding(resource_sym, persp_sym=nil)
+        if persp_sym.nil?
+          embeddings[resource_sym]
+        else
+          embeddings[resource_sym] = Embedding.new(resource_sym, persp_sym)
         end
       end
 
@@ -213,6 +234,11 @@ module Welo
       self.class.nesting(resource_sym)
     end
 
+    # Shorthand for class' embedding
+    def embedding(resource_sym)
+      self.class.embedding(resource_sym)
+    end
+
     # Returns the resource's path part mapping the various fields.
     # The objects must respond to .to_s and return a value such that
     # the URL part is valid (esp. no whitespace)
@@ -256,9 +282,44 @@ module Welo
                 send(sym)
               when Relationship
                 sym = rel.sym
-                link_for_rel(rel)
+                link_or_embedded_resource_for_rel(rel)
               end #case rel
         [sym, ret]
+      end
+    end
+
+    def link_or_embedded_resource_for_rel(rel)
+      if embedding(rel.sym)
+        embed_for_rel(rel)
+      else
+        link_for_rel(rel)
+      end
+    end
+
+    def embed_for_rel(rel)
+      sym = rel.sym
+      if rel.one?
+        single_embedder_for_rel(rel)
+      elsif rel.many?
+        embedders_enumerator_for_rel(rel)
+      else
+        raise ArgumentError, "unkown relationship kinds #{rel.kinds}"
+      end #case rel.kind
+    end
+
+    def single_embedder_for_rel(rel)
+      sym = rel.sym
+      Embedder.new(self, nil, :label => sym) do
+        send(sym)
+      end
+    end
+
+    def embedders_enumerator_for_rel(rel)
+      sym = rel.sym
+      EmbeddersEnumerator.new do |&blk|
+        send(sym).each do |i|
+          blk.call Embedder.new(self, i, :label => sym)
+        end
       end
     end
 

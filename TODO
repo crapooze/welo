@@ -1,5 +1,8 @@
+* Relationships
+  - we have :one, :many, we should be able to have, exactly_four, or one_per_foo
+* Epitheting vs. Nesting vs. Identifying
+  - remove alias from Relationship and create a similar Epiteth object?
+  - inherit all these from Link, NormalLink, EpithetLink, EmbeddedLink
 * Embeddings
-  - merge the branch
-  - use the complex serialization overhead only when needed loaded
-* Proxies
-  - a class like observations to manipulate distant
+  - how to work with recursing perspectives?
+* ResourceProxy
