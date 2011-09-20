@@ -64,8 +64,12 @@ module Welo
     # the enumerating object
     attr_reader :enum
 
+    # The labeling for this embedder, may be useful for knowing what the enumerator will spit out
+    attr_accessor :label
+
     def initialize(enum=nil, params={}, &blk)
       @enum = enum || blk
+      @label = params[:label]
     end
 
     def each

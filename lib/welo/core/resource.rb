@@ -316,7 +316,7 @@ module Welo
 
     def embedders_enumerator_for_rel(rel)
       sym = rel.sym
-      EmbeddersEnumerator.new do |&blk|
+      EmbeddersEnumerator.new(nil, :label => sym) do |&blk|
         send(sym).each do |i|
           blk.call Embedder.new(self, i, :label => sym)
         end
