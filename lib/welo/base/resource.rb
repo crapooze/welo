@@ -53,7 +53,7 @@ module Welo
     end
 
     def embedder_to_serialized_hash(embedder)
-      embedder.to.to_serialized_hash(embedder.perspective)
+      embedder.to.to_serialized_hash(embedder.perspective) if embedder.to
     end
 
     # similar to serialized_pairs, but with the Embedders serialized as hash
@@ -62,7 +62,6 @@ module Welo
       serialized_pairs(persp).map do |sym,val|
         new_val = case val
                   when Embedder
-                    val.to_serialized_hash
                     embedder_to_serialized_hash(val)
                   when EmbeddersEnumerator
                     val.map{|v| embedder_to_serialized_hash(v)}

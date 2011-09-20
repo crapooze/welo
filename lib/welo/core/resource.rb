@@ -289,7 +289,7 @@ module Welo
     end
 
     def link_or_embedded_resource_for_rel(rel)
-      if rel.embedding?
+      if embedding(rel.sym)
         embed_for_rel(rel)
       else
         link_for_rel(rel)
