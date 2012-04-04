@@ -27,7 +27,6 @@ spec = Gem::Specification.new do |s|
           'lib/welo/core/nesting.rb',
           'lib/welo/core/embedding.rb',
           'lib/welo/core/embedder.rb',
-          'lib/welo/core/observation.rb',
           'lib/welo/core/perspective.rb',
           'lib/welo/base/resource.rb',
         ]
